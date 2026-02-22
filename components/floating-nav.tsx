@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { Heart, Globe } from "lucide-react"
+import { Heart, Globe, Menu, X } from "lucide-react"
 import { locales, localeNames, type Locale } from "@/lib/i18n/config"
 import type { Dictionary } from "@/lib/i18n/dictionaries"
 
@@ -24,6 +24,7 @@ export function FloatingNav({ dict, locale }: FloatingNavProps) {
   const [visible, setVisible] = useState(false)
   const [activeSection, setActiveSection] = useState("")
   const [langOpen, setLangOpen] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const navItems = [
     { label: dict.home, href: "#top" },
@@ -73,6 +74,17 @@ export function FloatingNav({ dict, locale }: FloatingNavProps) {
     return () => document.removeEventListener("click", close)
   }, [langOpen])
 
+  useEffect(() => {
+    if (!mobileMenuOpen) return
+    const close = (e: MouseEvent) => {
+      const target = e.target as HTMLElement
+      if (target.closest("[data-mobile-menu]")) return
+      setMobileMenuOpen(false)
+    }
+    document.addEventListener("click", close)
+    return () => document.removeEventListener("click", close)
+  }, [mobileMenuOpen])
+
   return (
     <nav
       className={cn(
@@ -88,13 +100,68 @@ export function FloatingNav({ dict, locale }: FloatingNavProps) {
           <Heart className="h-3 w-3 text-accent" />
         </div>
 
-        {/* Nav items */}
+        {/* Mobile hamburger */}
+        <div className="sm:hidden" data-mobile-menu>
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              setMobileMenuOpen((v) => !v)
+            }}
+            className="flex items-center gap-1 rounded-full px-2 py-1 text-[10px] uppercase tracking-wide text-muted-foreground transition-all hover:text-foreground hover:bg-secondary"
+            aria-label="Toggle menu"
+          >
+            {mobileMenuOpen ? <X className="h-3 w-3" /> : <Menu className="h-3 w-3" />}
+            <span>Menu</span>
+          </button>
+
+          {mobileMenuOpen && (
+            <div className="absolute bottom-full left-0 mb-2 w-56 overflow-hidden rounded-2xl border border-border/80 bg-background/95 p-2 shadow-lg backdrop-blur-md">
+              <div className="flex flex-col gap-1">
+                {navItems.map((item) => (
+                  <a
+                    key={item.href}
+                    href={item.href}
+                    className={cn(
+                      "rounded-lg px-3 py-2 text-xs tracking-wide transition-colors",
+                      activeSection === item.href.replace("#", "")
+                        ? "bg-primary text-primary-foreground"
+                        : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+                    )}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {item.label}
+                  </a>
+                ))}
+              </div>
+              <div className="mt-2 border-t border-border/70 pt-2">
+                <p className="px-3 pb-1 text-[10px] uppercase tracking-wide text-muted-foreground">Language</p>
+                <div className="grid grid-cols-2 gap-1">
+                  {locales.map((l) => (
+                    <Link
+                      key={l}
+                      href={getRedirectedPathname(pathname, l)}
+                      className={cn(
+                        "rounded-lg px-2 py-1.5 text-center text-[11px] transition-colors",
+                        l === locale ? "bg-primary text-primary-foreground" : "bg-secondary/60 text-muted-foreground hover:text-foreground"
+                      )}
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      {l.toUpperCase()}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Nav items (desktop) */}
         {navItems.map((item) => (
           <a
             key={item.href}
             href={item.href}
             className={cn(
-              "rounded-full px-2 py-1 text-[10px] tracking-wide transition-all sm:px-3 sm:py-1.5 sm:text-xs",
+              "hidden rounded-full px-2 py-1 text-[10px] tracking-wide transition-all sm:inline-block sm:px-3 sm:py-1.5 sm:text-xs",
               activeSection === item.href.replace("#", "")
                 ? "bg-primary text-primary-foreground"
                 : "text-muted-foreground hover:text-foreground hover:bg-secondary"
@@ -104,8 +171,8 @@ export function FloatingNav({ dict, locale }: FloatingNavProps) {
           </a>
         ))}
 
-        {/* Language switcher */}
-        <div className="relative ml-0.5 sm:ml-1">
+        {/* Language switcher (desktop) */}
+        <div className="relative ml-0.5 hidden sm:block sm:ml-1">
           <button
             onClick={(e) => {
               e.stopPropagation()
