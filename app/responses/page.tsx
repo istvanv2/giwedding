@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useCallback } from "react"
-import { Lock, RefreshCw, Download, Users, CheckCircle, XCircle, Hotel } from "lucide-react"
+import { Lock, RefreshCw, Download, Users, CheckCircle, XCircle, Hotel, Pencil, Trash2 } from "lucide-react"
 
 interface RSVPRow {
   id: number
@@ -17,6 +17,11 @@ interface RSVPRow {
   message: string
 }
 
+function normalizeFlag(value: unknown): "Yes" | "No" {
+  if (value === true || value === "Yes" || value === "yes" || value === "true" || value === 1) return "Yes"
+  return "No"
+}
+
 export default function ResponsesPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [authToken, setAuthToken] = useState("")
@@ -25,6 +30,9 @@ export default function ResponsesPage() {
   const [loading, setLoading] = useState(false)
   const [data, setData] = useState<RSVPRow[]>([])
   const [fetching, setFetching] = useState(false)
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set())
+  const [busy, setBusy] = useState(false)
+  const [editingRow, setEditingRow] = useState<RSVPRow | null>(null)
 
   const authenticate = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -60,7 +68,7 @@ export default function ResponsesPage() {
       const res = await fetch("/api/responses-data", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token }),
+        body: JSON.stringify({ token, action: "list" }),
       })
       if (res.status === 401) {
         setIsAuthenticated(false)
@@ -69,7 +77,20 @@ export default function ResponsesPage() {
       }
       const json = await res.json()
       if (json.success) {
-        setData(json.data)
+        const rows: RSVPRow[] = (json.data as RSVPRow[]).map((row) => ({
+          ...row,
+          attending: normalizeFlag(row.attending),
+          accommodation: normalizeFlag(row.accommodation),
+        }))
+        setData(rows)
+        setSelectedIds((prev) => {
+          const next = new Set<number>()
+          const ids = new Set(rows.map((r) => r.id))
+          prev.forEach((id) => {
+            if (ids.has(id)) next.add(id)
+          })
+          return next
+        })
       }
     } catch {
       console.error("Failed to fetch data")
@@ -82,8 +103,8 @@ export default function ResponsesPage() {
     if (authToken) fetchDataWithToken(authToken)
   }, [authToken, fetchDataWithToken])
 
-  const exportCSV = () => {
-    if (data.length === 0) return
+  const exportCSV = (rows: RSVPRow[], suffix = "all") => {
+    if (rows.length === 0) return
 
     const headers = [
       "Submitted At",
@@ -100,7 +121,7 @@ export default function ResponsesPage() {
 
     const csvRows = [
       headers.join(","),
-      ...data.map((row) =>
+      ...rows.map((row) =>
         [
           row.submitted_at,
           `"${row.group_name}"`,
@@ -120,9 +141,80 @@ export default function ResponsesPage() {
     const url = URL.createObjectURL(blob)
     const a = document.createElement("a")
     a.href = url
-    a.download = `rsvp-responses-${new Date().toISOString().split("T")[0]}.csv`
+    a.download = `rsvp-responses-${suffix}-${new Date().toISOString().split("T")[0]}.csv`
     a.click()
     URL.revokeObjectURL(url)
+  }
+
+  const selectedRows = data.filter((r) => selectedIds.has(r.id))
+  const allSelected = data.length > 0 && selectedIds.size === data.length
+
+  const toggleSelectAll = () => {
+    setSelectedIds(allSelected ? new Set() : new Set(data.map((r) => r.id)))
+  }
+
+  const toggleSelectOne = (id: number) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  const startEditSelected = () => {
+    if (selectedRows.length !== 1) return
+    setEditingRow({ ...selectedRows[0] })
+  }
+
+  const saveEdit = async () => {
+    if (!editingRow || !authToken) return
+    setBusy(true)
+    setError("")
+    try {
+      const res = await fetch("/api/responses-data", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: authToken, action: "update", row: editingRow }),
+      })
+      const json = await res.json()
+      if (!res.ok || !json.success) {
+        setError(json.error || "Edit failed")
+      } else {
+        setEditingRow(null)
+        fetchData()
+      }
+    } catch {
+      setError("Edit failed")
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const deleteSelected = async () => {
+    if (!authToken || selectedIds.size === 0) return
+    if (!confirm(`Delete ${selectedIds.size} selected response(s)?`)) return
+    setBusy(true)
+    setError("")
+    try {
+      const res = await fetch("/api/responses-data", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: authToken, action: "delete", ids: Array.from(selectedIds) }),
+      })
+      const json = await res.json()
+      if (!res.ok || !json.success) {
+        setError(json.error || "Delete failed")
+      } else {
+        setSelectedIds(new Set())
+        setEditingRow(null)
+        fetchData()
+      }
+    } catch {
+      setError("Delete failed")
+    } finally {
+      setBusy(false)
+    }
   }
 
   // Compute stats
@@ -190,18 +282,69 @@ export default function ResponsesPage() {
               Refresh
             </button>
             <button
-              onClick={exportCSV}
+              onClick={() => exportCSV(data, "all")}
               disabled={data.length === 0}
               className="flex items-center gap-2 rounded-lg bg-[#8b7355] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#7a6548] disabled:opacity-50"
             >
               <Download className="h-4 w-4" />
-              Export CSV
+              Export all
+            </button>
+            <button
+              onClick={() => exportCSV(selectedRows, "selected")}
+              disabled={selectedIds.size === 0}
+              className="flex items-center gap-2 rounded-lg border border-[#e8e0d8] bg-white px-4 py-2 text-sm text-[#2c2420] transition hover:bg-[#faf8f5] disabled:opacity-50"
+            >
+              <Download className="h-4 w-4" />
+              Export selected ({selectedIds.size})
+            </button>
+            <button
+              onClick={startEditSelected}
+              disabled={selectedIds.size !== 1 || busy}
+              className="flex items-center gap-2 rounded-lg border border-[#e8e0d8] bg-white px-4 py-2 text-sm text-[#2c2420] transition hover:bg-[#faf8f5] disabled:opacity-50"
+            >
+              <Pencil className="h-4 w-4" />
+              Edit selected
+            </button>
+            <button
+              onClick={deleteSelected}
+              disabled={selectedIds.size === 0 || busy}
+              className="flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700 disabled:opacity-50"
+            >
+              <Trash2 className="h-4 w-4" />
+              Delete selected
             </button>
           </div>
         </div>
       </div>
 
       <div className="mx-auto max-w-7xl px-6 py-6">
+        {error && (
+          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {error}
+          </div>
+        )}
+
+        {editingRow && (
+          <div className="mb-6 rounded-xl border border-[#e8e0d8] bg-white p-4">
+            <h2 className="mb-3 font-medium text-[#2c2420]">Edit selected response (ID {editingRow.id})</h2>
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+              <input value={editingRow.group_name} onChange={(e) => setEditingRow({ ...editingRow, group_name: e.target.value })} placeholder="Group" className="rounded-lg border border-[#e8e0d8] px-3 py-2 text-sm" />
+              <input value={editingRow.person_name} onChange={(e) => setEditingRow({ ...editingRow, person_name: e.target.value })} placeholder="Person name" className="rounded-lg border border-[#e8e0d8] px-3 py-2 text-sm" />
+              <select value={editingRow.attending} onChange={(e) => setEditingRow({ ...editingRow, attending: e.target.value })} className="rounded-lg border border-[#e8e0d8] px-3 py-2 text-sm"><option>Yes</option><option>No</option></select>
+              <input value={editingRow.menu || ""} onChange={(e) => setEditingRow({ ...editingRow, menu: e.target.value })} placeholder="Menu" className="rounded-lg border border-[#e8e0d8] px-3 py-2 text-sm" />
+              <select value={editingRow.accommodation} onChange={(e) => setEditingRow({ ...editingRow, accommodation: e.target.value })} className="rounded-lg border border-[#e8e0d8] px-3 py-2 text-sm"><option>No</option><option>Yes</option></select>
+              <input value={editingRow.accommodation_details || ""} onChange={(e) => setEditingRow({ ...editingRow, accommodation_details: e.target.value })} placeholder="Accommodation details" className="rounded-lg border border-[#e8e0d8] px-3 py-2 text-sm" />
+              <input value={editingRow.email || ""} onChange={(e) => setEditingRow({ ...editingRow, email: e.target.value })} placeholder="Email" className="rounded-lg border border-[#e8e0d8] px-3 py-2 text-sm" />
+              <input value={editingRow.phone || ""} onChange={(e) => setEditingRow({ ...editingRow, phone: e.target.value })} placeholder="Phone" className="rounded-lg border border-[#e8e0d8] px-3 py-2 text-sm" />
+              <textarea value={editingRow.message || ""} onChange={(e) => setEditingRow({ ...editingRow, message: e.target.value })} placeholder="Message" className="rounded-lg border border-[#e8e0d8] px-3 py-2 text-sm md:col-span-2" rows={3} />
+            </div>
+            <div className="mt-3 flex gap-2">
+              <button onClick={saveEdit} disabled={busy} className="rounded-lg bg-[#8b7355] px-4 py-2 text-sm font-medium text-white disabled:opacity-50">Save</button>
+              <button onClick={() => setEditingRow(null)} disabled={busy} className="rounded-lg border border-[#e8e0d8] px-4 py-2 text-sm">Cancel</button>
+            </div>
+          </div>
+        )}
+
         {/* Stats */}
         <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-5">
           <div className="rounded-xl border border-[#e8e0d8] bg-white p-4">
@@ -254,6 +397,9 @@ export default function ResponsesPage() {
               <table className="w-full text-left text-sm">
                 <thead>
                   <tr className="border-b border-[#e8e0d8] bg-[#faf8f5]">
+                    <th className="whitespace-nowrap px-4 py-3">
+                      <input type="checkbox" checked={allSelected} onChange={toggleSelectAll} />
+                    </th>
                     <th className="whitespace-nowrap px-4 py-3 font-medium text-[#8b7355]">Date</th>
                     <th className="whitespace-nowrap px-4 py-3 font-medium text-[#8b7355]">Group</th>
                     <th className="whitespace-nowrap px-4 py-3 font-medium text-[#8b7355]">Name</th>
@@ -276,6 +422,13 @@ export default function ResponsesPage() {
                           isNewGroup && i > 0 ? "border-t-2 border-t-[#e8e0d8]" : ""
                         }`}
                       >
+                        <td className="whitespace-nowrap px-4 py-3">
+                          <input
+                            type="checkbox"
+                            checked={selectedIds.has(row.id)}
+                            onChange={() => toggleSelectOne(row.id)}
+                          />
+                        </td>
                         <td className="whitespace-nowrap px-4 py-3 text-[#6b5e50]">
                           {new Date(row.submitted_at).toLocaleDateString("ro-RO", {
                             day: "2-digit",
