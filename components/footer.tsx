@@ -17,10 +17,6 @@ export function Footer({ dict }: { dict: Dictionary["footer"] }) {
         </p>
 
         <div className="h-px w-12 bg-accent/40" />
-
-        <p className="text-xs tracking-wide text-muted-foreground/60">
-          {dict.madeWith}
-        </p>
       </AnimatedSection>
     </footer>
   )

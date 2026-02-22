@@ -459,14 +459,18 @@ export default function ResponsesPage() {
                           {row.menu || "-"}
                         </td>
                         <td className="whitespace-nowrap px-4 py-3">
-                          {row.accommodation === "Yes" ? (
-                            <span className="inline-flex rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-blue-700">
-                              Da
-                            </span>
-                          ) : row.accommodation ? (
-                            "Nu"
+                          {isNewGroup ? (
+                            row.accommodation === "Yes" ? (
+                              <span className="inline-flex rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-blue-700">
+                                Da
+                              </span>
+                            ) : row.accommodation ? (
+                              "Nu"
+                            ) : (
+                              "-"
+                            )
                           ) : (
-                            "-"
+                            ""
                           )}
                         </td>
                         <td className="whitespace-nowrap px-4 py-3 text-[#6b5e50]">
