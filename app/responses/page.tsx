@@ -222,6 +222,11 @@ export default function ResponsesPage() {
   const attending = data.filter((r) => r.attending === "Yes").length
   const notAttending = data.filter((r) => r.attending === "No").length
   const needAccommodation = data.filter((r) => r.accommodation === "Yes").length
+  const classicMenu = data.filter((r) => (r.menu || "").trim().toLowerCase() === "classic").length
+  const vegetarianMenu = data.filter((r) => {
+    const menu = (r.menu || "").trim().toLowerCase()
+    return menu === "vegetarian" || menu === "vegetariana" || menu === "vegetariană"
+  }).length
   const uniqueGroups = new Set(data.map((r) => r.group_name)).size
 
   if (!isAuthenticated) {
@@ -346,7 +351,7 @@ export default function ResponsesPage() {
         )}
 
         {/* Stats */}
-        <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-5">
+        <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-7">
           <div className="rounded-xl border border-[#e8e0d8] bg-white p-4">
             <div className="flex items-center gap-2 text-sm text-[#8b7355]">
               <Users className="h-4 w-4" />
@@ -374,6 +379,20 @@ export default function ResponsesPage() {
               Accommodation
             </div>
             <p className="mt-1 text-2xl font-semibold text-[#2c2420]">{needAccommodation}</p>
+          </div>
+          <div className="rounded-xl border border-[#e8e0d8] bg-white p-4">
+            <div className="flex items-center gap-2 text-sm text-[#8b7355]">
+              <Users className="h-4 w-4" />
+              Classic menu
+            </div>
+            <p className="mt-1 text-2xl font-semibold text-[#2c2420]">{classicMenu}</p>
+          </div>
+          <div className="rounded-xl border border-[#e8e0d8] bg-white p-4">
+            <div className="flex items-center gap-2 text-sm text-[#8b7355]">
+              <Users className="h-4 w-4" />
+              Vegetarian menu
+            </div>
+            <p className="mt-1 text-2xl font-semibold text-[#2c2420]">{vegetarianMenu}</p>
           </div>
           <div className="rounded-xl border border-[#e8e0d8] bg-white p-4">
             <div className="flex items-center gap-2 text-sm text-[#8b7355]">
