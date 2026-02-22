@@ -89,3 +89,8 @@ html {
   background: #c4a88240;
   color: var(--foreground);
 }
+
+/* Hide reCAPTCHA floating badge while showing legal disclosure text in UI */
+.grecaptcha-badge {
+  visibility: hidden;
+}

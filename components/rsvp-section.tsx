@@ -552,6 +552,29 @@ export function RSVPSection({ dict }: { dict: Dictionary["rsvp"] }) {
           <p className="text-xs text-destructive text-center animate-in fade-in duration-200">{serverError}</p>
         )}
 
+        {/* reCAPTCHA disclosure (required when badge is hidden) */}
+        <p className="max-w-md text-center text-[11px] leading-relaxed text-muted-foreground">
+          This site is protected by reCAPTCHA and the Google{" "}
+          <a
+            href="https://policies.google.com/privacy"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline underline-offset-2 hover:text-foreground"
+          >
+            Privacy Policy
+          </a>{" "}
+          and{" "}
+          <a
+            href="https://policies.google.com/terms"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline underline-offset-2 hover:text-foreground"
+          >
+            Terms of Service
+          </a>{" "}
+          apply.
+        </p>
+
         {/* Navigation buttons */}
         <div className="flex w-full items-center justify-between gap-4">
           {step > 0 ? (
