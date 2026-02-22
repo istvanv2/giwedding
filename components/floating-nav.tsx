@@ -33,6 +33,15 @@ export function FloatingNav({ dict, locale }: FloatingNavProps) {
     { label: dict.confirm, href: "#rsvp" },
   ]
 
+  const handleNavClick = (href: string) => {
+    const sectionId = href.replace("#", "")
+    const section = document.getElementById(sectionId)
+    if (section) {
+      section.scrollIntoView({ behavior: "smooth", block: "start" })
+      window.history.replaceState(null, "", pathname)
+    }
+  }
+
   useEffect(() => {
     const handleScroll = () => {
       if (window.innerWidth < 640) {
@@ -91,6 +100,15 @@ export function FloatingNav({ dict, locale }: FloatingNavProps) {
     return () => document.removeEventListener("click", close)
   }, [mobileMenuOpen])
 
+  useEffect(() => {
+    const navEntries = performance.getEntriesByType("navigation") as PerformanceNavigationTiming[]
+    const isReload = navEntries[0]?.type === "reload"
+    if (isReload && window.location.hash) {
+      window.history.replaceState(null, "", pathname)
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" })
+    }
+  }, [pathname])
+
   return (
     <>
       <div
@@ -124,7 +142,11 @@ export function FloatingNav({ dict, locale }: FloatingNavProps) {
                       ? "bg-primary text-primary-foreground"
                       : "text-muted-foreground hover:bg-secondary hover:text-foreground"
                   )}
-                  onClick={() => setMobileMenuOpen(false)}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    handleNavClick(item.href)
+                    setMobileMenuOpen(false)
+                  }}
                 >
                   {item.label}
                 </a>
@@ -175,6 +197,10 @@ export function FloatingNav({ dict, locale }: FloatingNavProps) {
                   ? "bg-primary text-primary-foreground"
                   : "text-muted-foreground hover:text-foreground hover:bg-secondary"
               )}
+              onClick={(e) => {
+                e.preventDefault()
+                handleNavClick(item.href)
+              }}
             >
               {item.label}
             </a>
