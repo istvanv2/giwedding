@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { DM_Sans, Cormorant_Garamond } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
+import { ScrollReset } from '@/components/scroll-reset'
 import './globals.css'
 
 const dmSans = DM_Sans({
@@ -62,6 +63,7 @@ export default function RootLayout({
   return (
     <html className={`${dmSans.variable} ${cormorant.variable}`} suppressHydrationWarning>
       <body className="font-sans antialiased">
+        <ScrollReset />
         {children}
         <Analytics />
       </body>
