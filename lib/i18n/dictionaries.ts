@@ -90,6 +90,7 @@ export interface Dictionary {
     next: string
     back: string
     submit: string
+    submitting: string
     thankYou: string
     thankYouMessage: string
   }
@@ -190,6 +191,7 @@ const ro: Dictionary = {
     next: "Continuă",
     back: "Înapoi",
     submit: "Trimite confirmarea",
+    submitting: "Se trimite...",
     thankYou: "Mulțumim!",
     thankYouMessage: "Am primit confirmarea ta. Abia așteptăm să ne vedem pe 11 Iulie 2026!",
   },
@@ -290,6 +292,7 @@ const hu: Dictionary = {
     next: "Tovább",
     back: "Vissza",
     submit: "Visszajelzés küldése",
+    submitting: "Küldés...",
     thankYou: "Köszönjük!",
     thankYouMessage: "Megkaptuk a visszajelzésedet. Alig várjuk, hogy találkozzunk 2026. július 11-én!",
   },
@@ -390,6 +393,7 @@ const en: Dictionary = {
     next: "Continue",
     back: "Back",
     submit: "Send RSVP",
+    submitting: "Sending...",
     thankYou: "Thank you!",
     thankYouMessage: "We have received your RSVP. We cannot wait to celebrate with you on July 11, 2026!",
   },
@@ -490,6 +494,7 @@ const de: Dictionary = {
     next: "Weiter",
     back: "Zur\u00fcck",
     submit: "R\u00fcckmeldung senden",
+    submitting: "Wird gesendet...",
     thankYou: "Vielen Dank!",
     thankYouMessage: "Wir haben eure R\u00fcckmeldung erhalten. Wir freuen uns riesig auf den 11. Juli 2026!",
   },
@@ -590,6 +595,7 @@ const fr: Dictionary = {
     next: "Continuer",
     back: "Retour",
     submit: "Envoyer la confirmation",
+    submitting: "Envoi...",
     thankYou: "Merci\u00a0!",
     thankYouMessage: "Nous avons bien re\u00e7u votre r\u00e9ponse. Nous avons h\u00e2te de c\u00e9l\u00e9brer avec vous le 11 juillet 2026\u00a0!",
   },

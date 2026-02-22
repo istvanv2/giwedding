@@ -20,6 +20,9 @@ export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://giwedding.com"),
   title: "Giorgia & Istv\u00e1n's Wedding",
   description: "Save the date - 11 July 2026, Targu-Mures",
+  alternates: {
+    canonical: "https://giwedding.com/ro",
+  },
   icons: {
     icon: "/heart-icon.svg",
     apple: "/favicon.jpg",
@@ -27,7 +30,16 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Giorgia & Istv\u00e1n's Wedding",
     description: "Save the date - 11 July 2026, Targu-Mures",
-    images: ["/images/1.jpg"],
+    url: "https://giwedding.com/ro",
+    siteName: "GIwedding",
+    images: [
+      {
+        url: "/images/1.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Giorgia & István's Wedding",
+      },
+    ],
     type: "website",
   },
   twitter: {

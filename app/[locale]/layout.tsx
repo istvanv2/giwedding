@@ -36,10 +36,22 @@ export async function generateMetadata({
   return {
     title: meta.title,
     description: meta.description,
+    alternates: {
+      canonical: `https://giwedding.com/${locale}`,
+    },
     openGraph: {
       title: meta.title,
       description: meta.description,
-      images: ["/images/1.jpg"],
+      url: `https://giwedding.com/${locale}`,
+      siteName: "GIwedding",
+      images: [
+        {
+          url: "/images/1.jpg",
+          width: 1200,
+          height: 630,
+          alt: meta.title,
+        },
+      ],
       type: "website",
       locale: locale,
     },

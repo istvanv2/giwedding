@@ -35,6 +35,10 @@ export function FloatingNav({ dict, locale }: FloatingNavProps) {
 
   useEffect(() => {
     const handleScroll = () => {
+      if (window.innerWidth < 640) {
+        setVisible(true)
+        return
+      }
       setVisible(window.scrollY > window.innerHeight * 0.5)
     }
 
@@ -53,10 +57,12 @@ export function FloatingNav({ dict, locale }: FloatingNavProps) {
     sections.forEach((section) => observer.observe(section))
 
     window.addEventListener("scroll", handleScroll, { passive: true })
+    window.addEventListener("resize", handleScroll, { passive: true })
     handleScroll()
 
     return () => {
       window.removeEventListener("scroll", handleScroll)
+      window.removeEventListener("resize", handleScroll)
       observer.disconnect()
     }
   }, [])
