@@ -141,8 +141,8 @@ export async function POST(request: Request) {
               submitted_at, group_name, person_name, attending, menu,
               accommodation, accommodation_details, email, phone, message
             ) VALUES (
-              ${row.timestamp}, ${row.group}, ${row.personName}, ${row.attending},
-              ${row.menu}, ${row.accommodation}, ${row.accommodationDetails},
+              ${row.timestamp}, ${row.group}, ${row.personName}, ${row.attending === "Yes"},
+              ${row.menu}, ${row.accommodation === "Yes"}, ${row.accommodationDetails},
               ${row.email}, ${row.phone}, ${row.message}
             )
           `

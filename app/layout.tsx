@@ -17,22 +17,23 @@ const cormorant = Cormorant_Garamond({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://giwedding.com"),
   title: "Giorgia & Istv\u00e1n's Wedding",
-  description: "Save the date - 11 July 2026",
+  description: "Save the date - 11 July 2026, Targu-Mures",
   icons: {
     icon: "/heart-icon.svg",
     apple: "/favicon.jpg",
   },
   openGraph: {
     title: "Giorgia & Istv\u00e1n's Wedding",
-    description: "Save the date - 11 July 2026",
+    description: "Save the date - 11 July 2026, Targu-Mures",
     images: ["/images/1.jpg"],
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
     title: "Giorgia & Istv\u00e1n's Wedding",
-    description: "Save the date - 11 July 2026",
+    description: "Save the date - 11 July 2026, Targu-Mures",
     images: ["/images/1.jpg"],
   },
 }

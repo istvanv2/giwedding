@@ -5,23 +5,23 @@ import type { Metadata } from "next"
 const ogMeta: Record<string, { title: string; description: string }> = {
   ro: {
     title: "Nunta Giorgia & Istv\u00e1n",
-    description: "V\u0103 invit\u0103m cu drag la nunta noastr\u0103 \u2013 11 Iulie 2026",
+    description: "Save the date - 11 Iulie 2026, Targu-Mures",
   },
   hu: {
     title: "Giorgia & Istv\u00e1n esk\u00fcv\u0151je",
-    description: "Szeretettel megh\u00edvunk az esk\u00fcv\u0151nkre \u2013 2026. j\u00falius 11.",
+    description: "Save the date - 2026. július 11., Targu-Mures",
   },
   en: {
     title: "Giorgia & Istv\u00e1n's Wedding",
-    description: "Save the date \u2013 11 July 2026",
+    description: "Save the date - 11 July 2026, Targu-Mures",
   },
   de: {
     title: "Hochzeit Giorgia & Istv\u00e1n",
-    description: "Wir laden euch herzlich zu unserer Hochzeit ein \u2013 11. Juli 2026",
+    description: "Save the date - 11. Juli 2026, Targu-Mures",
   },
   fr: {
     title: "Mariage Giorgia & Istv\u00e1n",
-    description: "Nous vous invitons \u00e0 notre mariage \u2013 11 juillet 2026",
+    description: "Save the date - 11 juillet 2026, Targu-Mures",
   },
 }
 
