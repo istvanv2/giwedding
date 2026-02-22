@@ -112,12 +112,13 @@ export function MobileImageBanner({
   position?: string
 }) {
   return (
-    <div className="relative h-[56vh] w-full overflow-hidden sm:h-[62vh] lg:hidden">
+    <div className="relative w-full lg:hidden">
       <Image
         src={src}
         alt={alt}
-        fill
-        className="object-cover"
+        width={1200}
+        height={1600}
+        className="h-auto w-full object-contain"
         style={{ objectPosition: position }}
         sizes="100vw"
         priority
