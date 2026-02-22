@@ -127,51 +127,54 @@ export async function POST(request: Request) {
       })),
     ]
 
-    // Save to Neon database (primary storage -- must succeed)
+    // Save to Neon database (primary storage)
     stage = "config_check"
-    if (!DATABASE_URL) {
-      return NextResponse.json(
-        { error: "Service temporarily unavailable. Please try again later." },
-        { status: 503 }
-      )
-    }
-
-    // Save to Neon database (primary storage -- must succeed)
-    stage = "db_init"
-    const sql = neon(DATABASE_URL)
-    stage = "db_insert"
-    for (const row of rows) {
-      await sql`
-        INSERT INTO rsvp_responses (
-          submitted_at, group_name, person_name, attending, menu,
-          accommodation, accommodation_details, email, phone, message
-        ) VALUES (
-          ${row.timestamp}, ${row.group}, ${row.personName}, ${row.attending},
-          ${row.menu}, ${row.accommodation}, ${row.accommodationDetails},
-          ${row.email}, ${row.phone}, ${row.message}
-        )
-      `
+    let dbSaved = false
+    if (DATABASE_URL) {
+      try {
+        stage = "db_init"
+        const sql = neon(DATABASE_URL)
+        stage = "db_insert"
+        for (const row of rows) {
+          await sql`
+            INSERT INTO rsvp_responses (
+              submitted_at, group_name, person_name, attending, menu,
+              accommodation, accommodation_details, email, phone, message
+            ) VALUES (
+              ${row.timestamp}, ${row.group}, ${row.personName}, ${row.attending},
+              ${row.menu}, ${row.accommodation}, ${row.accommodationDetails},
+              ${row.email}, ${row.phone}, ${row.message}
+            )
+          `
+        }
+        dbSaved = true
+      } catch (dbError) {
+        console.error("[RSVP] Database write failed, attempting sheet fallback:", dbError)
+      }
+    } else {
+      console.error("[RSVP] DATABASE_URL missing, attempting sheet fallback.")
     }
 
     // Append to Google Sheets (secondary -- graceful fail)
     stage = "sheet_append"
+    let sheetSaved = false
     try {
       await appendToSheet(rows)
+      sheetSaved = true
     } catch (sheetError) {
-      console.error("[RSVP] Google Sheets error (data is safe in DB):", sheetError)
+      console.error("[RSVP] Google Sheets write failed:", sheetError)
     }
 
-    return NextResponse.json({ success: true })
-  } catch (err) {
-    const isMissingDbConfigError =
-      err instanceof Error &&
-      err.message.includes("No database connection string was provided")
-    if (isMissingDbConfigError) {
+    if (!dbSaved && !sheetSaved) {
       return NextResponse.json(
         { error: "Service temporarily unavailable. Please try again later." },
         { status: 503 }
       )
     }
+
+    return NextResponse.json({ success: true })
+  } catch (err) {
+    console.error("[RSVP] Unexpected route failure at stage:", stage, err)
     return NextResponse.json(
       { error: "An unexpected error occurred." },
       { status: 500 }

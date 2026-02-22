@@ -5,7 +5,7 @@ import { AnimatedSection } from "@/components/animated-section"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-import { Heart, Send, Check, Plus, X, ArrowRight, ArrowLeft, User, Users, UtensilsCrossed, Mail, Phone, BedDouble } from "lucide-react"
+import { Heart, Send, Check, ArrowRight, ArrowLeft, User, Users, UtensilsCrossed, Mail, Phone, BedDouble } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { Dictionary } from "@/lib/i18n/dictionaries"
 
@@ -40,7 +40,7 @@ export function RSVPSection({ dict }: { dict: Dictionary["rsvp"] }) {
   const [mainAttending, setMainAttending] = useState(true)
   const [mainMenu, setMainMenu] = useState<"classic" | "vegetarian">("classic")
 
-  // Step 1: Guests (start with one empty guest by default)
+  // Step 1: One optional companion
   const [guests, setGuests] = useState<Guest[]>([
     { id: "guest-0", name: "", attending: true, menu: "classic" },
   ])
@@ -71,14 +71,6 @@ export function RSVPSection({ dict }: { dict: Dictionary["rsvp"] }) {
     document.head.appendChild(script)
   }, [])
 
-  const addGuest = useCallback(() => {
-    setGuests((prev) => [...prev, { id: `guest-${Date.now()}`, name: "", attending: true, menu: "classic" }])
-  }, [])
-
-  const removeGuest = useCallback((id: string) => {
-    setGuests((prev) => prev.filter((g) => g.id !== id))
-  }, [])
-
   const updateGuest = useCallback((id: string, field: keyof Guest, value: string | boolean) => {
     setGuests((prev) => prev.map((g) => (g.id === id ? { ...g, [field]: value } : g)))
   }, [])
@@ -90,7 +82,7 @@ export function RSVPSection({ dict }: { dict: Dictionary["rsvp"] }) {
   const canProceed = () => {
     switch (step) {
       case 0: return mainName.trim().length > 0
-      case 1: return guests.length === 0 || guests.every((g) => g.name.trim().length > 0)
+      case 1: return true
       case 2: return true
       case 3: return true
       case 4: return true
@@ -287,34 +279,15 @@ export function RSVPSection({ dict }: { dict: Dictionary["rsvp"] }) {
               </div>
               <p className="text-sm text-muted-foreground">{t.guestsDescription}</p>
 
-              {guests.map((guest, idx) => (
-                <div key={guest.id} className="flex items-center gap-3 animate-in fade-in slide-in-from-bottom-2 duration-200">
-                  <Input
-                    value={guest.name}
-                    onChange={(e) => updateGuest(guest.id, "name", e.target.value)}
-                    placeholder={t.guestNamePlaceholder}
-                    className="flex-1 border-border/60 bg-card font-light tracking-wide placeholder:text-muted-foreground/40 focus-visible:ring-primary/30"
-                    autoFocus={idx === guests.length - 1}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => removeGuest(guest.id)}
-                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border/60 text-muted-foreground transition-colors hover:border-destructive/50 hover:text-destructive"
-                    aria-label={t.removeGuest}
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                </div>
-              ))}
-
-              <button
-                type="button"
-                onClick={addGuest}
-                className="flex items-center justify-center gap-2 rounded-lg border border-dashed border-border/80 py-3 text-sm text-muted-foreground transition-colors hover:border-primary/40 hover:text-primary"
-              >
-                <Plus className="h-4 w-4" />
-                {t.addGuest}
-              </button>
+              <div className="flex items-center gap-3 animate-in fade-in slide-in-from-bottom-2 duration-200">
+                <Input
+                  value={guests[0]?.name ?? ""}
+                  onChange={(e) => updateGuest("guest-0", "name", e.target.value)}
+                  placeholder={t.guestNamePlaceholder}
+                  className="flex-1 border-border/60 bg-card font-light tracking-wide placeholder:text-muted-foreground/40 focus-visible:ring-primary/30"
+                  autoFocus
+                />
+              </div>
             </div>
           )}
 

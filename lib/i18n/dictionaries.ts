@@ -41,6 +41,7 @@ export interface Dictionary {
     }
     directions: string
     addCalendar: string
+    calendarEventPrefix: string
   }
   qa: {
     sectionLabel: string
@@ -136,6 +137,7 @@ const ro: Dictionary = {
     },
     directions: "Indicații",
     addCalendar: "Adaugă în calendar",
+    calendarEventPrefix: "Nunta Giorgia & István",
   },
   qa: {
     sectionLabel: "Întrebări frecvente",
@@ -235,6 +237,7 @@ const hu: Dictionary = {
     },
     directions: "Útvonaltervező",
     addCalendar: "Naptárhoz adás",
+    calendarEventPrefix: "Giorgia és István esküvője",
   },
   qa: {
     sectionLabel: "Gyakori kérdések",
@@ -334,6 +337,7 @@ const en: Dictionary = {
     },
     directions: "Get directions",
     addCalendar: "Add to calendar",
+    calendarEventPrefix: "Wedding Giorgia & István",
   },
   qa: {
     sectionLabel: "Frequently asked questions",
@@ -433,6 +437,7 @@ const de: Dictionary = {
     },
     directions: "Anfahrt",
     addCalendar: "Zum Kalender hinzuf\u00fcgen",
+    calendarEventPrefix: "Hochzeit Giorgia & István",
   },
   qa: {
     sectionLabel: "H\u00e4ufig gestellte Fragen",
@@ -532,6 +537,7 @@ const fr: Dictionary = {
     },
     directions: "Itin\u00e9raire",
     addCalendar: "Ajouter au calendrier",
+    calendarEventPrefix: "Mariage Giorgia & István",
   },
   qa: {
     sectionLabel: "Questions fr\u00e9quentes",

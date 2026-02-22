@@ -3,6 +3,7 @@
 import { Church, PartyPopper, Clock, Navigation, CalendarDays } from "lucide-react"
 import { AnimatedSection } from "@/components/animated-section"
 import type { Dictionary } from "@/lib/i18n/dictionaries"
+import type { Locale } from "@/lib/i18n/config"
 
 interface EventCardProps {
   icon: React.ReactNode
@@ -12,11 +13,12 @@ interface EventCardProps {
   location: string
   address: string
   mapsUrl: string
+  calendarUrl: string
   labels: { directions: string; addCalendar: string }
   delay?: number
 }
 
-function EventCard({ icon, title, time, description, location, address, mapsUrl, labels, delay = 0 }: EventCardProps) {
+function EventCard({ icon, title, time, description, location, address, mapsUrl, calendarUrl, labels, delay = 0 }: EventCardProps) {
   return (
     <AnimatedSection delay={delay} className="w-full">
       <div className="flex flex-col items-center gap-4 text-center lg:gap-5">
@@ -55,7 +57,9 @@ function EventCard({ icon, title, time, description, location, address, mapsUrl,
           </a>
           <span className="text-border">|</span>
           <a
-            href="#"
+            href={calendarUrl}
+            target="_blank"
+            rel="noopener noreferrer"
             className="group flex items-center gap-2 text-xs text-muted-foreground transition-colors hover:text-foreground"
           >
             <CalendarDays className="h-3.5 w-3.5 transition-transform group-hover:scale-110" />
@@ -67,8 +71,10 @@ function EventCard({ icon, title, time, description, location, address, mapsUrl,
   )
 }
 
-export function EventSection({ dict }: { dict: Dictionary["events"] }) {
+export function EventSection({ dict, locale }: { dict: Dictionary["events"]; locale: Locale }) {
   const labels = { directions: dict.directions, addCalendar: dict.addCalendar }
+  const ceremonyCalendarUrl = `/api/calendar?event=ceremony&locale=${locale}`
+  const celebrationCalendarUrl = `/api/calendar?event=celebration&locale=${locale}`
 
   return (
     <div className="px-6 py-16 sm:py-20 md:px-10 lg:px-16 lg:py-24">
@@ -94,6 +100,7 @@ export function EventSection({ dict }: { dict: Dictionary["events"] }) {
           location={dict.ceremony.location}
           address={dict.ceremony.address}
           mapsUrl="https://maps.google.com/?q=Biserica+Reformata+din+Cetate+Targu+Mures"
+          calendarUrl={ceremonyCalendarUrl}
           labels={labels}
           delay={0}
         />
@@ -105,6 +112,7 @@ export function EventSection({ dict }: { dict: Dictionary["events"] }) {
           location={dict.celebration.location}
           address={dict.celebration.address}
           mapsUrl="https://maps.google.com/?q=Hotel+Privo+Targu+Mures"
+          calendarUrl={celebrationCalendarUrl}
           labels={labels}
           delay={200}
         />

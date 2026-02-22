@@ -45,7 +45,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
           {/* ── Events / Schedule ── */}
           <section id="events">
             <MobileImageBanner src="/images/5.jpg" alt="Giorgia & Istv\u00e1n" position="center 20%" />
-            <EventSection dict={dict.events} />
+            <EventSection dict={dict.events} locale={locale as Locale} />
           </section>
 
           {/* ── Q&A ── */}
