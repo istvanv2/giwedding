@@ -6,8 +6,8 @@
 const base = process.env.NEXT_PUBLIC_SITE_URL || "https://giwedding.com"
 export const SITE_URL = base.replace(/\/$/, "")
 
-/** Smaller dedicated preview image (run `npm run generate:og` after changing hero image). Bump ?v= when changing the image to refresh WhatsApp cache. */
-export const OG_IMAGE_URL = `${SITE_URL}/images/og-preview.jpg?v=1`
-/** Dimensions of og-preview.jpg (800×420) – must match scripts/generate-og-preview.mjs */
-export const OG_IMAGE_WIDTH = 800
-export const OG_IMAGE_HEIGHT = 420
+/** Full-size preview image so WhatsApp shows a large preview card. Bump ?v= when changing the image to refresh cache. */
+export const OG_IMAGE_URL = `${SITE_URL}/images/1.jpg?v=1`
+/** Dimensions for OG (hero image 1.jpg). Use 1200×630 so preview occupies more space. */
+export const OG_IMAGE_WIDTH = 1200
+export const OG_IMAGE_HEIGHT = 630
