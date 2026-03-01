@@ -1,4 +1,5 @@
 import { locales, type Locale } from "@/lib/i18n/config"
+import { SITE_URL, OG_IMAGE_URL, OG_IMAGE_WIDTH, OG_IMAGE_HEIGHT } from "@/lib/site"
 import { notFound } from "next/navigation"
 import type { Metadata } from "next"
 
@@ -37,18 +38,18 @@ export async function generateMetadata({
     title: meta.title,
     description: meta.description,
     alternates: {
-      canonical: `https://giwedding.com/${locale}`,
+      canonical: `${SITE_URL}/${locale}`,
     },
     openGraph: {
       title: meta.title,
       description: meta.description,
-      url: `https://giwedding.com/${locale}`,
+      url: `${SITE_URL}/${locale}`,
       siteName: "GIwedding",
       images: [
         {
-          url: "/images/1.jpg",
-          width: 1200,
-          height: 630,
+          url: OG_IMAGE_URL,
+          width: OG_IMAGE_WIDTH,
+          height: OG_IMAGE_HEIGHT,
           alt: meta.title,
         },
       ],
@@ -59,7 +60,7 @@ export async function generateMetadata({
       card: "summary_large_image",
       title: meta.title,
       description: meta.description,
-      images: ["/images/1.jpg"],
+      images: [OG_IMAGE_URL],
     },
   }
 }
