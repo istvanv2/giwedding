@@ -8,29 +8,27 @@ export function ScrollReset() {
       window.history.scrollRestoration = "manual"
     }
 
-    const clearHashAndScrollTop = () => {
+    const scrollToTop = () => {
       if (window.location.hash) {
         window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}`)
       }
       window.scrollTo(0, 0)
     }
 
-    const navEntries = performance.getEntriesByType("navigation") as PerformanceNavigationTiming[]
-    const isReload = navEntries[0]?.type === "reload"
-    const legacyIsReload = (performance as Performance & { navigation?: { type?: number } }).navigation?.type === 1
-    if (isReload || legacyIsReload) {
-      clearHashAndScrollTop()
-      setTimeout(() => window.scrollTo(0, 0), 0)
-    }
+    // Always start at top on load (link, reload, or back/forward from bfcache)
+    scrollToTop()
+    requestAnimationFrame(() => scrollToTop())
+    const t = setTimeout(() => scrollToTop(), 0)
+    const t2 = setTimeout(() => scrollToTop(), 150) // Override any late focus/scroll (e.g. form)
 
     const onPageShow = (event: PageTransitionEvent) => {
-      if (event.persisted) {
-        window.scrollTo(0, 0)
-      }
+      if (event.persisted) scrollToTop()
     }
 
     window.addEventListener("pageshow", onPageShow)
     return () => {
+      clearTimeout(t)
+      clearTimeout(t2)
       window.removeEventListener("pageshow", onPageShow)
     }
   }, [])
