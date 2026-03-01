@@ -22,7 +22,7 @@ export function middleware(request: NextRequest) {
       const redirectUrl = new URL(request.url)
       redirectUrl.protocol = "https:"
       redirectUrl.host = canonicalHost
-      return NextResponse.redirect(redirectUrl)
+      return NextResponse.redirect(redirectUrl, 308)
     }
   }
 
@@ -47,7 +47,7 @@ export function middleware(request: NextRequest) {
   // Redirect to default locale
   const localeUrl = request.nextUrl.clone()
   localeUrl.pathname = `/${defaultLocale}${pathname}`
-  return NextResponse.redirect(localeUrl)
+  return NextResponse.redirect(localeUrl, 308)
 }
 
 export const config = {
